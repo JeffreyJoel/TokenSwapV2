@@ -7,17 +7,22 @@ contract TokenSwap {
     IERC20 tokenB;
     uint256 public exchangeRate;
 
-    constructor(address _tokenA, address _tokenB, uint256 _exchangeRate) {
+    event Swapped(address _swapper, uint256 _amountReceived, uint256 _amountRemitted);
+
+    constructor(address _tokenA, address _tokenB) {
         tokenA = IERC20(_tokenA);
         tokenB = IERC20(_tokenB);
-        exchangeRate = _exchangeRate;
+        exchangeRate = 100;
     }
+
 
     function swapAToB(uint256 _amount) external {
         require(tokenA.balanceOf(msg.sender) >= _amount, "Not enough A tokens");
      
         tokenA.transferFrom(msg.sender, address(this), _amount);
         tokenB.transfer(msg.sender, _amount * exchangeRate);
+
+        emit Swapped(msg.sender, _amount, _amount * exchangeRate);
     }
 
     function swapBToA(uint256 _amount) external {
@@ -25,5 +30,8 @@ contract TokenSwap {
 
         tokenB.transferFrom(msg.sender, address(this), _amount);
         tokenA.transfer(msg.sender, _amount / exchangeRate);
+
+        emit Swapped(msg.sender, _amount, _amount / exchangeRate);
+
     }
 }
